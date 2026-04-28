@@ -34,7 +34,7 @@ const Dashboard = () => {
 
   return (
     <AppLayout>
-      <div className="bg-radial-fade">
+      <div>
         <div className="mx-auto max-w-7xl space-y-8 p-6 lg:p-10">
           <PageHeader
             eyebrow="Garage 01 · Calle Serrano"
