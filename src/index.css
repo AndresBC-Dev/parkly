@@ -9,7 +9,7 @@
 
 @layer base {
   :root {
-    /* Light "glassmorphism" mode (kept clean & minimal) */
+    /* Sober monochrome — Linear / Vercel inspired */
     --background: 0 0% 100%;
     --foreground: 240 10% 8%;
 
@@ -19,9 +19,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 8%;
 
-    --primary: 152 76% 44%;
-    --primary-foreground: 152 80% 8%;
-    --primary-glow: 152 90% 60%;
+    --primary: 240 10% 10%;
+    --primary-foreground: 0 0% 98%;
+    --primary-glow: 240 6% 30%;
 
     --secondary: 240 5% 96%;
     --secondary-foreground: 240 10% 12%;
@@ -32,76 +32,79 @@
     --accent: 240 5% 96%;
     --accent-foreground: 240 10% 12%;
 
-    --destructive: 350 89% 60%;
+    --destructive: 0 65% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 152 76% 44%;
+    --success: 152 40% 40%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
+    --warning: 38 80% 50%;
     --warning-foreground: 38 92% 8%;
 
     --border: 240 6% 90%;
     --input: 240 6% 90%;
-    --ring: 152 76% 44%;
+    --ring: 240 6% 30%;
 
     --radius: 0.75rem;
 
     --sidebar-background: 240 6% 98%;
     --sidebar-foreground: 240 5% 26%;
-    --sidebar-primary: 152 76% 44%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary: 240 10% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 240 5% 94%;
     --sidebar-accent-foreground: 240 10% 12%;
     --sidebar-border: 240 6% 90%;
-    --sidebar-ring: 152 76% 44%;
+    --sidebar-ring: 240 6% 30%;
   }
 
   .dark {
-    /* Zinc-950 base, Zinc-800 borders, Emerald accent */
-    --background: 240 10% 4%;          /* zinc-950 */
-    --foreground: 0 0% 98%;
+    /* Zinc-950 base — sober monochrome accent (no neon) */
+    --background: 240 10% 4%;
+    --foreground: 0 0% 96%;
 
-    --card: 240 8% 6%;                 /* slightly raised */
-    --card-foreground: 0 0% 98%;
+    --card: 240 8% 6%;
+    --card-foreground: 0 0% 96%;
 
     --popover: 240 9% 7%;
-    --popover-foreground: 0 0% 98%;
+    --popover-foreground: 0 0% 96%;
 
-    --primary: 152 76% 50%;            /* emerald-500 */
-    --primary-foreground: 152 90% 8%;
-    --primary-glow: 152 90% 60%;
+    /* Primary is near-white for buttons / accents (Vercel-style) */
+    --primary: 0 0% 96%;
+    --primary-foreground: 240 10% 6%;
+    --primary-glow: 0 0% 70%;
 
     --secondary: 240 6% 12%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary-foreground: 0 0% 96%;
 
     --muted: 240 5% 11%;
-    --muted-foreground: 240 5% 60%;
+    --muted-foreground: 240 5% 56%;
 
     --accent: 240 6% 14%;
-    --accent-foreground: 0 0% 98%;
+    --accent-foreground: 0 0% 96%;
 
-    --destructive: 350 89% 60%;        /* rose-500 */
+    /* Muted rose, not neon */
+    --destructive: 0 60% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 152 76% 50%;
+    /* Success used very sparingly — desaturated sage */
+    --success: 152 22% 48%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 55%;
+    --warning: 38 70% 55%;
     --warning-foreground: 38 92% 8%;
 
-    --border: 240 5% 16%;              /* zinc-800-ish */
-    --input: 240 5% 16%;
-    --ring: 152 76% 50%;
+    --border: 240 5% 14%;
+    --input: 240 5% 14%;
+    --ring: 240 5% 40%;
 
     --sidebar-background: 240 10% 5%;
-    --sidebar-foreground: 240 5% 70%;
-    --sidebar-primary: 152 76% 50%;
-    --sidebar-primary-foreground: 152 90% 8%;
+    --sidebar-foreground: 240 5% 65%;
+    --sidebar-primary: 0 0% 96%;
+    --sidebar-primary-foreground: 240 10% 6%;
     --sidebar-accent: 240 6% 11%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 240 5% 14%;
-    --sidebar-ring: 152 76% 50%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 240 5% 12%;
+    --sidebar-ring: 240 5% 40%;
   }
 }
 
@@ -147,18 +150,13 @@
     color: transparent;
   }
 
-  /* Glow for available slots */
-  .slot-glow-available {
-    box-shadow:
-      0 0 0 1px hsl(var(--primary) / 0.35),
-      0 0 24px -4px hsl(var(--primary) / 0.45),
-      inset 0 0 12px -6px hsl(var(--primary) / 0.4);
+  /* Sober slot states — no glow, just refined borders */
+  .slot-state-available {
+    box-shadow: inset 0 0 0 1px hsl(var(--border));
   }
 
-  .slot-glow-occupied {
-    box-shadow:
-      0 0 0 1px hsl(var(--destructive) / 0.35),
-      0 0 18px -6px hsl(var(--destructive) / 0.35);
+  .slot-state-occupied {
+    box-shadow: inset 0 0 0 1px hsl(var(--foreground) / 0.12);
   }
 
   .glass {

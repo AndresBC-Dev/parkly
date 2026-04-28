@@ -44,8 +44,8 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2.5 px-2 py-2">
-          <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
-            <CircleParking className="h-4.5 w-4.5 text-primary" strokeWidth={2.5} />
+          <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground text-background">
+            <CircleParking className="h-4 w-4" strokeWidth={2.5} />
           </div>
           {!collapsed && (
             <div className="flex flex-col leading-tight">
@@ -100,7 +100,7 @@ export function AppSidebar() {
 
       <SidebarFooter className="border-t border-sidebar-border">
         <div className="flex items-center gap-2.5 px-2 py-1.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-glow text-[11px] font-semibold text-primary-foreground">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold text-foreground ring-1 ring-border">
             AM
           </div>
           {!collapsed && (

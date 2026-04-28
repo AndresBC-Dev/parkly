@@ -67,7 +67,7 @@ export function ParkingMap({ compact = false }: ParkingMapProps) {
 
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <div className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-primary" />
+            <span className="h-2 w-2 rounded-full border border-border bg-muted-foreground/30" />
             <span>{total - occupied} free</span>
           </div>
           <div className="flex items-center gap-1.5">
