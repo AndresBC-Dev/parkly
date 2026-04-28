@@ -17,11 +17,9 @@ export function SlotCard({ slot, onClick }: SlotCardProps) {
     <button
       onClick={onClick}
       className={cn(
-        "group relative flex aspect-[4/3] flex-col rounded-xl border bg-card p-2.5 text-left transition-all duration-200",
-        "hover:-translate-y-0.5 hover:border-foreground/20",
-        occupied
-          ? "border-destructive/30 slot-glow-occupied"
-          : "border-primary/25 slot-glow-available",
+        "group relative flex aspect-[4/3] flex-col rounded-xl border border-border bg-card p-2.5 text-left transition-all duration-200",
+        "hover:-translate-y-0.5 hover:border-foreground/30 hover:bg-accent/40",
+        occupied ? "slot-state-occupied" : "slot-state-available bg-muted/30",
       )}
     >
       <div className="flex items-center justify-between">
@@ -33,7 +31,7 @@ export function SlotCard({ slot, onClick }: SlotCardProps) {
           <span
             className={cn(
               "h-1.5 w-1.5 rounded-full",
-              occupied ? "bg-destructive" : "bg-primary animate-subtle-pulse",
+              occupied ? "bg-destructive/80" : "bg-muted-foreground/40",
             )}
           />
         </div>
@@ -41,16 +39,16 @@ export function SlotCard({ slot, onClick }: SlotCardProps) {
 
       <div className="flex flex-1 items-center justify-center px-1.5">
         {occupied ? (
-          <Sprite className="w-full max-h-12 text-foreground/85" />
+          <Sprite className="w-full max-h-12 text-foreground/80" />
         ) : (
-          <span className="text-[10px] uppercase tracking-[0.18em] text-primary/80">
+          <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">
             Free
           </span>
         )}
       </div>
 
       {occupied && (
-        <div className="truncate text-center font-mono text-[10px] tracking-wider text-foreground/70">
+        <div className="truncate text-center font-mono text-[10px] tracking-wider text-foreground/60">
           {slot.vehicle?.plate}
         </div>
       )}
