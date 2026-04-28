@@ -1,4 +1,5 @@
-import { Car, Bike, Clock, User, MapPin, LogOut } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Car, Bike, Clock, User, MapPin, LogOut, ExternalLink } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -13,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import type { Slot } from "@/lib/parking-types";
 import { useParkingStore } from "@/lib/parking-store";
 import { CheckInDialog } from "@/components/checkin/CheckInDialog";
+import { PlanBadge } from "@/components/customers/PlanBadge";
 import { toast } from "sonner";
 
 interface SlotSheetProps {
