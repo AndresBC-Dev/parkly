@@ -32,8 +32,12 @@ function formatDuration(from: Date) {
 
 export function SlotSheet({ slot, open, onOpenChange }: SlotSheetProps) {
   const checkOut = useParkingStore((s) => s.checkOut);
+  const customers = useParkingStore((s) => s.customers);
   if (!slot) return null;
   const occupied = !!slot.vehicle;
+  const customer = slot.vehicle?.customerId
+    ? customers.find((c) => c.id === slot.vehicle!.customerId)
+    : undefined;
   const Icon = slot.type === "car" ? Car : Bike;
 
   return (
@@ -93,6 +97,31 @@ export function SlotSheet({ slot, open, onOpenChange }: SlotSheetProps) {
                     })}
                   />
                 </div>
+
+                {customer ? (
+                  <div className="rounded-xl border border-border bg-card p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                          Linked customer
+                        </p>
+                        <p className="mt-1 truncate text-sm font-medium">{customer.name}</p>
+                        <p className="truncate text-[11px] text-muted-foreground">{customer.email}</p>
+                      </div>
+                      <PlanBadge plan={customer.plan} />
+                    </div>
+                    <Button asChild variant="ghost" size="sm" className="mt-3 h-7 gap-1 px-2 text-xs">
+                      <Link to="/customers">
+                        Open profile
+                        <ExternalLink className="h-3 w-3" />
+                      </Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-dashed border-border p-3 text-[11px] text-muted-foreground">
+                    Walk-in entry — not linked to a customer profile.
+                  </div>
+                )}
               </>
             ) : (
               <div className="rounded-xl border border-dashed border-primary/40 bg-primary/5 p-6 text-center">
