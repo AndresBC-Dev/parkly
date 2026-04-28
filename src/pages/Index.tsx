@@ -59,7 +59,6 @@ const Dashboard = () => {
               delta={4}
               hint="vs. yesterday"
               icon={CircleParking}
-              accent="primary"
             />
             <KpiCard
               label="Revenue today"
