@@ -47,8 +47,8 @@ export function SlotSheet({ slot, open, onOpenChange }: SlotSheetProps) {
                 variant="outline"
                 className={
                   occupied
-                    ? "border-destructive/40 text-destructive"
-                    : "border-primary/40 text-primary"
+                    ? "border-destructive/40 text-destructive bg-destructive/5"
+                    : "border-border text-muted-foreground bg-muted/40"
                 }
               >
                 {occupied ? "Occupied" : "Available"}

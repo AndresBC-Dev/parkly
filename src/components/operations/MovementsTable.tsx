@@ -68,9 +68,9 @@ export function MovementsTable({ movements, limit }: MovementsTableProps) {
                   <Badge
                     variant="outline"
                     className={cn(
-                      "gap-1.5 font-medium",
+                      "gap-1.5 font-medium capitalize",
                       m.status === "active" &&
-                        "border-primary/40 text-primary bg-primary/5",
+                        "border-foreground/20 text-foreground bg-foreground/[0.04]",
                       m.status === "completed" &&
                         "border-border text-muted-foreground",
                       m.status === "overdue" &&
@@ -80,8 +80,8 @@ export function MovementsTable({ movements, limit }: MovementsTableProps) {
                     <span
                       className={cn(
                         "h-1.5 w-1.5 rounded-full",
-                        m.status === "active" && "bg-primary animate-subtle-pulse",
-                        m.status === "completed" && "bg-muted-foreground",
+                        m.status === "active" && "bg-foreground/70 animate-subtle-pulse",
+                        m.status === "completed" && "bg-muted-foreground/60",
                         m.status === "overdue" && "bg-destructive",
                       )}
                     />

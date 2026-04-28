@@ -26,10 +26,10 @@ export function KpiCard({ label, value, delta, hint, icon: Icon, accent = "muted
         </div>
         <div
           className={cn(
-            "flex h-9 w-9 items-center justify-center rounded-lg",
+            "flex h-9 w-9 items-center justify-center rounded-lg ring-1",
             accent === "primary"
-              ? "bg-primary/15 text-primary ring-1 ring-primary/30"
-              : "bg-muted text-muted-foreground ring-1 ring-border",
+              ? "bg-foreground/5 text-foreground ring-border"
+              : "bg-muted text-muted-foreground ring-border",
           )}
         >
           <Icon className="h-4 w-4" />
@@ -43,7 +43,7 @@ export function KpiCard({ label, value, delta, hint, icon: Icon, accent = "muted
               className={cn(
                 "inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 font-medium",
                 positive
-                  ? "bg-primary/10 text-primary"
+                  ? "bg-foreground/5 text-foreground/80 ring-1 ring-border"
                   : "bg-destructive/10 text-destructive",
               )}
             >
