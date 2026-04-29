@@ -25,6 +25,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useParkingStore } from "@/lib/parking-store";
 import type { Customer } from "@/lib/parking-types";
+import { useTranslation } from "@/lib/translations";
 
 interface CustomerDialogProps {
   trigger: ReactNode;
@@ -41,6 +42,8 @@ export function CustomerDialog({ trigger, customer }: CustomerDialogProps) {
   const isEdit = !!customer;
   const addCustomer = useParkingStore((s) => s.addCustomer);
   const updateCustomer = useParkingStore((s) => s.updateCustomer);
+  const language = useParkingStore((s) => s.language);
+  const { t } = useTranslation(language);
 
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -104,7 +107,7 @@ export function CustomerDialog({ trigger, customer }: CustomerDialogProps) {
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
           <DialogTitle className="text-base font-semibold tracking-tight">
-            {isEdit ? "Edit customer" : "New customer"}
+            {isEdit ? `${t("edit")} ${t("customers")}` : `${t("newCheckIn")} ${t("customers")}`}
           </DialogTitle>
           <DialogDescription className="text-xs">
             {isEdit
@@ -117,7 +120,7 @@ export function CustomerDialog({ trigger, customer }: CustomerDialogProps) {
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2 space-y-1.5">
               <Label htmlFor="cname" className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Full name
+                {language === "es" ? "Nombre completo" : "Full name"}
               </Label>
               <Input
                 id="cname"
@@ -177,7 +180,7 @@ export function CustomerDialog({ trigger, customer }: CustomerDialogProps) {
 
           <div className="space-y-1.5">
             <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Vehicle plates
+              {language === "es" ? "Placas del vehículo" : "Vehicle plates"}
             </Label>
             <div className="flex gap-2">
               <Input
@@ -238,7 +241,7 @@ export function CustomerDialog({ trigger, customer }: CustomerDialogProps) {
             </Button>
             <Button type="submit" disabled={submitting} className="gap-1.5">
               {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              {isEdit ? "Save changes" : "Create customer"}
+              {isEdit ? t("save") : t("confirm")}
             </Button>
           </DialogFooter>
         </form>

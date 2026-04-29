@@ -42,7 +42,15 @@ const Dashboard = () => {
 
   const movementsToday = movements.filter((m) => {
     const d = new Date(m.checkIn);
-    return d >= today;
+    const isToday = d >= today;
+    return isToday;
+  });
+
+  console.log("Dashboard Stats:", {
+    totalMovements: movements.length,
+    today: today.toISOString(),
+    movementsToday: movementsToday.length,
+    completedToday: movementsToday.filter(m => m.status === "completed").length
   });
 
   const revenueToday = sumConverted(

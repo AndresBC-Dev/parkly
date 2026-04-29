@@ -38,6 +38,7 @@ import { Badge } from "@/components/ui/badge";
 import { useParkingStore } from "@/lib/parking-store";
 import type { VehicleType } from "@/lib/parking-types";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/translations";
 
 interface CheckInDialogProps {
   trigger: ReactNode;
@@ -55,6 +56,8 @@ export function CheckInDialog({ trigger, defaultSlot }: CheckInDialogProps) {
 
   const checkIn = useParkingStore((s) => s.checkIn);
   const customers = useParkingStore((s) => s.customers);
+  const language = useParkingStore((s) => s.language);
+  const { t } = useTranslation(language);
 
   const selected = useMemo(
     () => customers.find((c) => c.id === customerId),
@@ -117,7 +120,7 @@ export function CheckInDialog({ trigger, defaultSlot }: CheckInDialogProps) {
       <DialogContent className="sm:max-w-[460px]">
         <DialogHeader>
           <DialogTitle className="text-base font-semibold tracking-tight">
-            Vehicle check-in
+            {t("checkin")}
           </DialogTitle>
           <DialogDescription className="text-xs">
             Register a new entry. Link an existing customer or create a one-off entry.
@@ -128,7 +131,7 @@ export function CheckInDialog({ trigger, defaultSlot }: CheckInDialogProps) {
           {/* Customer picker */}
           <div className="space-y-1.5">
             <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Customer (optional)
+              {t("customers")} ({t("optional")})
             </Label>
             <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
               <PopoverTrigger asChild>
@@ -146,7 +149,7 @@ export function CheckInDialog({ trigger, defaultSlot }: CheckInDialogProps) {
                       </Badge>
                     </span>
                   ) : (
-                    <span className="text-muted-foreground">Search customer or leave blank…</span>
+                    <span className="text-muted-foreground">{t("searchCustomer")}…</span>
                   )}
                   <ChevronsUpDown className="ml-2 h-3.5 w-3.5 text-muted-foreground" />
                 </Button>
@@ -200,7 +203,7 @@ export function CheckInDialog({ trigger, defaultSlot }: CheckInDialogProps) {
 
           <div className="space-y-1.5">
             <Label htmlFor="plate" className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              License plate
+              {t("plate")}
             </Label>
             <Input
               id="plate"
@@ -214,7 +217,7 @@ export function CheckInDialog({ trigger, defaultSlot }: CheckInDialogProps) {
 
           <div className="space-y-1.5">
             <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Vehicle type
+              {language === "es" ? "Tipo de vehículo" : "Vehicle type"}
             </Label>
             <Select value={type} onValueChange={(v) => setType(v as VehicleType)}>
               <SelectTrigger>
@@ -245,7 +248,7 @@ export function CheckInDialog({ trigger, defaultSlot }: CheckInDialogProps) {
 
           <div className="space-y-1.5">
             <Label htmlFor="owner" className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Owner
+              {t("owner")}
             </Label>
             <Input
               id="owner"
@@ -265,11 +268,11 @@ export function CheckInDialog({ trigger, defaultSlot }: CheckInDialogProps) {
 
           <DialogFooter className="pt-2">
             <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button type="submit" disabled={submitting} className="gap-1.5">
               {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              Check in
+              {t("checkin")}
             </Button>
           </DialogFooter>
         </form>

@@ -45,6 +45,7 @@ import {
 import { useParkingStore } from "@/lib/parking-store";
 import { formatCurrency } from "@/lib/utils";
 import type { Rate, VehicleType, RateUnit } from "@/lib/parking-types";
+import { useTranslation } from "@/lib/translations";
 import { toast } from "sonner";
 
 const Rates = () => {
@@ -53,6 +54,8 @@ const Rates = () => {
   const updateRate = useParkingStore((s) => s.updateRate);
   const deleteRate = useParkingStore((s) => s.deleteRate);
   const currency = useParkingStore((s) => s.currency);
+  const language = useParkingStore((s) => s.language);
+  const { t } = useTranslation(language);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingRate, setEditingRate] = useState<Rate | null>(null);
@@ -100,10 +103,10 @@ const Rates = () => {
 
   const getUnitLabel = (unit: RateUnit, fraction?: number) => {
     switch (unit) {
-      case "minute": return "Per Minute";
-      case "hour": return "Per Hour";
-      case "day": return "Per Day (24h)";
-      case "fraction": return `Per ${fraction || 15} Min Fraction`;
+      case "minute": return t("minute");
+      case "hour": return t("hour");
+      case "day": return t("day");
+      case "fraction": return `${t("fraction")} (${fraction || 15} min)`;
       default: return unit;
     }
   };
@@ -113,12 +116,12 @@ const Rates = () => {
       <div className="mx-auto max-w-7xl space-y-8 p-6 lg:p-10">
         <PageHeader
           eyebrow="Configuration"
-          title="Rate Management"
+          title={t("rates")}
           description="Manage pricing for different vehicle categories and time units."
           actions={
             <Button onClick={handleOpenAdd} className="gap-1.5">
               <Plus className="h-4 w-4" />
-              New Rate
+              {t("newCheckIn")}
             </Button>
           }
         />
@@ -128,10 +131,10 @@ const Rates = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/30">
-                  <TableHead className="w-[180px]">Vehicle Type</TableHead>
-                  <TableHead>Charge Unit</TableHead>
-                  <TableHead>Value</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-[180px]">{t("status")}</TableHead>
+                  <TableHead>{t("out")}</TableHead>
+                  <TableHead>{t("amount")}</TableHead>
+                  <TableHead className="text-right">{t("viewAll")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -180,18 +183,18 @@ const Rates = () => {
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Delete Pricing Rate?</AlertDialogTitle>
+                                <AlertDialogTitle>{t("confirmDelete")}</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  This will remove the pricing for <strong>{rate.vehicleType}</strong> ({rate.unit}). This cannot be undone.
+                                  {t("deleteDesc")}
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
                                 <AlertDialogAction 
                                   onClick={() => handleDelete(rate.id)}
                                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                 >
-                                  Delete
+                                  {t("delete")}
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
@@ -243,7 +246,7 @@ const Rates = () => {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>{editingRate ? "Edit Rate" : "New Rate"}</DialogTitle>
+              <DialogTitle>{editingRate ? t("edit") : t("confirm")}</DialogTitle>
               <DialogDescription>
                 Configure how much to charge for a specific vehicle category.
               </DialogDescription>
@@ -312,10 +315,10 @@ const Rates = () => {
 
               <DialogFooter className="pt-2">
                 <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)}>
-                  Cancel
+                  {t("cancel")}
                 </Button>
                 <Button type="submit">
-                  {editingRate ? "Update Rate" : "Create Rate"}
+                  {editingRate ? t("save") : t("confirm")}
                 </Button>
               </DialogFooter>
             </form>

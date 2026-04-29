@@ -11,7 +11,15 @@ import {
 import { useParkingStore } from "@/lib/parking-store";
 import { useNavigate } from "react-router-dom";
 
-export function GlobalSearch() {
+import { useTranslation } from "@/lib/translations";
+
+interface GlobalSearchProps {
+  placeholder?: string;
+}
+
+export function GlobalSearch({ placeholder }: GlobalSearchProps) {
+  const language = useParkingStore((s) => s.language);
+  const { t } = useTranslation(language);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const customers = useParkingStore((s) => s.customers);
@@ -36,18 +44,18 @@ export function GlobalSearch() {
         className="hidden md:flex relative w-full max-w-sm h-9 items-center gap-2 rounded-md border border-border/60 bg-muted/40 px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/60"
       >
         <Search className="h-3.5 w-3.5" />
-        <span>Search plate, customer, slot…</span>
+        <span>{placeholder || t("search")}</span>
         <kbd className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-border bg-background px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
           ⌘K
         </kbd>
       </button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type a plate, name or slot to search…" />
+        <CommandInput placeholder={t("search")} />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
           
-          <CommandGroup heading="Customers">
+          <CommandGroup heading={t("customers")}>
             {customers.slice(0, 5).map((c) => (
               <CommandItem
                 key={c.id}
@@ -63,7 +71,7 @@ export function GlobalSearch() {
             ))}
           </CommandGroup>
 
-          <CommandGroup heading="Active Slots">
+          <CommandGroup heading={t("map")}>
             {slots.filter(s => s.vehicle).slice(0, 5).map((s) => (
               <CommandItem
                 key={s.id}
@@ -78,7 +86,7 @@ export function GlobalSearch() {
             ))}
           </CommandGroup>
 
-          <CommandGroup heading="Recent Movements">
+          <CommandGroup heading={t("operations")}>
             {movements.slice(0, 5).map((m) => (
               <CommandItem
                 key={m.id}

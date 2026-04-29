@@ -15,6 +15,7 @@ import type { Slot } from "@/lib/parking-types";
 import { useParkingStore } from "@/lib/parking-store";
 import { CheckInDialog } from "@/components/checkin/CheckInDialog";
 import { PlanBadge } from "@/components/customers/PlanBadge";
+import { useTranslation } from "@/lib/translations";
 import { toast } from "sonner";
 
 interface SlotSheetProps {
@@ -33,6 +34,8 @@ function formatDuration(from: Date) {
 export function SlotSheet({ slot, open, onOpenChange }: SlotSheetProps) {
   const checkOut = useParkingStore((s) => s.checkOut);
   const customers = useParkingStore((s) => s.customers);
+  const language = useParkingStore((s) => s.language);
+  const { t } = useTranslation(language);
   if (!slot) return null;
   const occupied = !!slot.vehicle;
   const customer = slot.vehicle?.customerId
@@ -57,7 +60,7 @@ export function SlotSheet({ slot, open, onOpenChange }: SlotSheetProps) {
                     : "border-border text-muted-foreground bg-muted/40"
                 }
               >
-                {occupied ? "Occupied" : "Available"}
+                {occupied ? (language === "es" ? "Ocupado" : "Occupied") : (language === "es" ? "Disponible" : "Available")}
               </Badge>
             </div>
             <SheetTitle className="text-2xl font-semibold tracking-tight">
@@ -74,7 +77,7 @@ export function SlotSheet({ slot, open, onOpenChange }: SlotSheetProps) {
               <>
                 <div className="rounded-xl border border-border bg-muted/30 p-4">
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                    License plate
+                    {t("plate")}
                   </p>
                   <p className="mt-1 font-mono text-2xl font-semibold tracking-wider">
                     {slot.vehicle?.plate}
@@ -82,15 +85,15 @@ export function SlotSheet({ slot, open, onOpenChange }: SlotSheetProps) {
                 </div>
 
                 <div className="grid grid-cols-1 gap-3">
-                  <InfoRow icon={User} label="Owner" value={slot.vehicle!.owner} />
+                  <InfoRow icon={User} label={t("owner")} value={slot.vehicle!.owner} />
                   <InfoRow
                     icon={Clock}
-                    label="Time parked"
+                    label={language === "es" ? "Tiempo parqueado" : "Time parked"}
                     value={formatDuration(slot.vehicle!.enteredAt)}
                   />
                   <InfoRow
                     icon={MapPin}
-                    label="Entered at"
+                    label={language === "es" ? "Entrada" : "Entered at"}
                     value={slot.vehicle!.enteredAt.toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -128,9 +131,9 @@ export function SlotSheet({ slot, open, onOpenChange }: SlotSheetProps) {
                 <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-primary">
                   <Icon className="h-5 w-5" />
                 </div>
-                <p className="text-sm font-medium">Slot is available</p>
+                <p className="text-sm font-medium">{language === "es" ? "Espacio disponible" : "Slot is available"}</p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Assign a new check-in directly to this space.
+                  {language === "es" ? "Asigna una nueva entrada a este espacio." : "Assign a new check-in directly to this space."}
                 </p>
               </div>
             )}
@@ -149,17 +152,17 @@ export function SlotSheet({ slot, open, onOpenChange }: SlotSheetProps) {
                     toast.success(`Checked out ${slot.vehicle?.plate}`);
                     onOpenChange(false);
                   } catch (error) {
-                    toast.error("Check-out failed");
+                    toast.error(t("checkoutFailed"));
                   }
                 }}
               >
                 <LogOut className="h-4 w-4" />
-                Check out vehicle
+                {t("checkout")}
               </Button>
             ) : (
               <CheckInDialog
                 defaultSlot={slot.id}
-                trigger={<Button className="w-full">Assign vehicle to slot</Button>}
+                trigger={<Button className="w-full">{t("assignVehicle")}</Button>}
               />
             )}
           </SheetFooter>

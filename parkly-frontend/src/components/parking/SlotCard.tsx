@@ -2,6 +2,8 @@ import { Car, Bike } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Slot } from "@/lib/parking-types";
 import { CarSilhouette, MotorcycleSilhouette } from "@/components/icons/VehicleSprites";
+import { useParkingStore } from "@/lib/parking-store";
+import { useTranslation } from "@/lib/translations";
 
 interface SlotCardProps {
   slot: Slot;
@@ -9,6 +11,8 @@ interface SlotCardProps {
 }
 
 export function SlotCard({ slot, onClick }: SlotCardProps) {
+  const language = useParkingStore((s) => s.language);
+  const { t } = useTranslation(language);
   const occupied = !!slot.vehicle;
   const Icon = slot.type === "motorcycle" ? Bike : Car;
   const Sprite = slot.type === "motorcycle" ? MotorcycleSilhouette : CarSilhouette;
@@ -42,7 +46,7 @@ export function SlotCard({ slot, onClick }: SlotCardProps) {
           <Sprite className="w-full max-h-12 text-foreground/80" />
         ) : (
           <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">
-            Free
+            {language === "es" ? "Libre" : "Free"}
           </span>
         )}
       </div>

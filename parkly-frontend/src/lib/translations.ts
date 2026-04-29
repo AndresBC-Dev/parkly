@@ -54,6 +54,8 @@ export const translations = {
     searchCustomer: "Search customer",
     selectSlot: "Select slot",
     optional: "Optional",
+    checkoutFailed: "Check-out failed",
+    assignVehicle: "Assign vehicle",
   },
   es: {
     dashboard: "Panel de Control",
@@ -108,6 +110,8 @@ export const translations = {
     searchCustomer: "Buscar cliente",
     selectSlot: "Seleccionar espacio",
     optional: "Opcional",
+    checkoutFailed: "Error al registrar salida",
+    assignVehicle: "Asignar vehículo",
   }
 };
 

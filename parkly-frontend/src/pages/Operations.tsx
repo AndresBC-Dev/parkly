@@ -7,10 +7,13 @@ import { Button } from "@/components/ui/button";
 import { useParkingStore } from "@/lib/parking-store";
 import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
+import { useTranslation } from "@/lib/translations";
 
 type Filter = "all" | "active" | "completed";
 
 const Operations = () => {
+  const language = useParkingStore((s) => s.language);
+  const { t } = useTranslation(language);
   const movements = useParkingStore((s) => s.movements);
   const [filter, setFilter] = useState<Filter>("all");
   const [query, setQuery] = useState("");
@@ -25,9 +28,9 @@ const Operations = () => {
   }, [movements, filter, query]);
 
   const tabs: { id: Filter; label: string; count: number }[] = [
-    { id: "all", label: "All", count: movements.length },
-    { id: "active", label: "Active", count: movements.filter((m) => m.status === "active").length },
-    { id: "completed", label: "Completed", count: movements.filter((m) => m.status === "completed").length },
+    { id: "all", label: t("viewAll"), count: movements.length },
+    { id: "active", label: t("active"), count: movements.filter((m) => m.status === "active").length },
+    { id: "completed", label: t("completed"), count: movements.filter((m) => m.status === "completed").length },
   ];
 
   return (
@@ -35,7 +38,7 @@ const Operations = () => {
       <div className="mx-auto max-w-7xl space-y-8 p-6 lg:p-10">
         <PageHeader
           eyebrow="Operations"
-          title="Movements"
+          title={t("operations")}
           description="A historical and real-time log of every check-in and check-out."
         />
 
@@ -67,7 +70,7 @@ const Operations = () => {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Filter by plate, owner, slot…"
+              placeholder={t("search")}
               className="h-9 pl-8 text-sm"
             />
           </div>

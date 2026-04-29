@@ -99,7 +99,7 @@ export const useParkingStore = create<ParkingState>((set, get) => ({
     try {
       const res = await api.get<Customer[]>("/customers");
       // Map strings to Dates
-      const customers = res.data.map(c => ({
+      const customers = (res.data || []).map(c => ({
         ...c,
         createdAt: new Date(c.createdAt)
       }));
@@ -132,7 +132,7 @@ export const useParkingStore = create<ParkingState>((set, get) => ({
   fetchSlots: async () => {
     try {
       const res = await api.get<Slot[]>("/slots");
-      const slots = res.data.map(s => ({
+      const slots = (res.data || []).map(s => ({
         ...s,
         vehicle: s.vehicle ? { ...s.vehicle, enteredAt: new Date(s.vehicle.enteredAt) } : null
       }));
@@ -175,7 +175,7 @@ export const useParkingStore = create<ParkingState>((set, get) => ({
   fetchMovements: async () => {
     try {
       const res = await api.get<Movement[]>("/movements");
-      const movements = res.data.map(m => ({
+      const movements = (res.data || []).map(m => ({
         ...m,
         checkIn: new Date(m.checkIn),
         checkOut: m.checkOut ? new Date(m.checkOut) : null

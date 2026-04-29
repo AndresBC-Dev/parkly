@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math"
 	"net/http"
 	"strings"
@@ -109,11 +110,13 @@ func (s *Server) handleCheckIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleCheckOut(w http.ResponseWriter, r *http.Request) {
-	slotID := r.URL.Query().Get("slotId")
+	slotID := strings.TrimSpace(r.URL.Query().Get("slotId"))
 	if slotID == "" {
+		log.Printf("Check-out failed: missing slotId in query")
 		http.Error(w, "missing slotId", http.StatusBadRequest)
 		return
 	}
+	log.Printf("DEBUG: Attempting check-out for slotID: '%s'", slotID)
 
 	slots := s.Store.GetSlots()
 	var targetSlot *Slot
@@ -125,9 +128,12 @@ func (s *Server) handleCheckOut(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if targetSlot == nil || targetSlot.Vehicle == nil {
+		log.Printf("Check-out failed: slot %s not found or not occupied", slotID)
 		http.Error(w, "slot not occupied or not found", http.StatusNotFound)
 		return
 	}
+
+	log.Printf("Processing check-out for slot %s, plate %s", slotID, targetSlot.Vehicle.Plate)
 
 	// 1. Calculate amount based on snapshot rate
 	rate := targetSlot.Vehicle.RateSnapshot
@@ -154,16 +160,31 @@ func (s *Server) handleCheckOut(w http.ResponseWriter, r *http.Request) {
 
 	// 2. Update Movement
 	movements := s.Store.GetMovements()
+	log.Printf("DEBUG: Found %d total movements to scan", len(movements))
+	found := false
 	for i := range movements {
-		if movements[i].SlotID == slotID && movements[i].Status == Active {
+		m := movements[i]
+		log.Printf("DEBUG: Checking movement %s - SlotID: '%s', Status: '%s'", m.ID, m.SlotID, m.Status)
+		
+		if strings.TrimSpace(m.SlotID) == slotID && strings.ToLower(string(m.Status)) == "active" {
 			now := time.Now()
 			movements[i].Status = Completed
 			movements[i].CheckOut = &now
 			movements[i].Amount = amount
 			movements[i].Currency = rate.Currency
-			s.Store.UpdateMovement(movements[i].ID, movements[i])
+			
+			log.Printf("DEBUG: MATCH FOUND! Updating movement %s to completed. Amount: %f", movements[i].ID, amount)
+			if ok := s.Store.UpdateMovement(movements[i].ID, movements[i]); !ok {
+				log.Printf("ERROR: Failed to update movement %s in database", movements[i].ID)
+			} else {
+				log.Printf("SUCCESS: Movement %s updated successfully", movements[i].ID)
+			}
+			found = true
 			break
 		}
+	}
+	if !found {
+		log.Printf("DEBUG: No active movement match found for slotID '%s'", slotID)
 	}
 
 	// 3. Clear Slot

@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Plus, Trash2, Layout, Settings as SettingsIcon, ShieldCheck, MapPin } from "lucide-react";
 import { useParkingStore } from "@/lib/parking-store";
-import type { VehicleType, Currency } from "@/lib/parking-types";
+import type { VehicleType, Currency, Language } from "@/lib/parking-types";
 import { toast } from "sonner";
 import { Coins } from "lucide-react";
 import { useTranslation } from "@/lib/translations";
@@ -47,6 +47,7 @@ const Settings = () => {
   const updateSlot = useParkingStore((s) => s.updateSlot);
   const currency = useParkingStore((s) => s.currency);
   const setCurrency = useParkingStore((s) => s.setCurrency);
+  const migrateRates = useParkingStore((s) => s.migrateRates);
   const language = useParkingStore((s) => s.language);
   const { t } = useTranslation(language);
   const setLanguage = useParkingStore((s) => s.setLanguage);
@@ -270,6 +271,8 @@ const Settings = () => {
                       <SelectItem value="COP">COP ($)</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
                 <div className="flex items-center justify-between gap-4 py-2 border-t border-border/50 pt-4">
                   <div className="space-y-0.5">
                     <Label>Language / Idioma</Label>

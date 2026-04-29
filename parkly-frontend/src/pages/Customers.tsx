@@ -27,12 +27,15 @@ import { CustomerDialog } from "@/components/customers/CustomerDialog";
 import { PlanBadge } from "@/components/customers/PlanBadge";
 import { useParkingStore } from "@/lib/parking-store";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/translations";
 
 const Customers = () => {
   const customers = useParkingStore((s) => s.customers);
   const movements = useParkingStore((s) => s.movements);
   const slots = useParkingStore((s) => s.slots);
   const deleteCustomer = useParkingStore((s) => s.deleteCustomer);
+  const language = useParkingStore((s) => s.language);
+  const { t } = useTranslation(language);
 
   const [query, setQuery] = useState("");
   const [planFilter, setPlanFilter] = useState<"all" | "casual" | "monthly" | "vip">("all");
@@ -68,7 +71,7 @@ const Customers = () => {
     movements.filter((m) => m.customerId === customerId).length;
 
   const tabs = [
-    { id: "all" as const, label: "All", count: stats.total },
+    { id: "all" as const, label: t("viewAll"), count: stats.total },
     { id: "casual" as const, label: "Casual", count: stats.casual },
     { id: "monthly" as const, label: "Monthly", count: stats.monthly },
     { id: "vip" as const, label: "VIP", count: stats.vip },
@@ -79,7 +82,7 @@ const Customers = () => {
       <div className="mx-auto max-w-7xl space-y-8 p-6 lg:p-10">
         <PageHeader
           eyebrow="Directory"
-          title="Customers"
+          title={t("customers")}
           description="Manage registered drivers, vehicles and subscription plans."
           actions={
             <CustomerDialog
@@ -138,12 +141,12 @@ const Customers = () => {
           <Table>
             <TableHeader>
               <TableRow className="border-border/60 hover:bg-transparent">
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Customer</TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Contact</TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Plates</TableHead>
+                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{t("customers")}</TableHead>
+                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{language === "es" ? "Contacto" : "Contact"}</TableHead>
+                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{language === "es" ? "Placas" : "Plates"}</TableHead>
                 <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Plan</TableHead>
-                <TableHead className="text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Visits</TableHead>
-                <TableHead className="text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Status</TableHead>
+                <TableHead className="text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{language === "es" ? "Visitas" : "Visits"}</TableHead>
+                <TableHead className="text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{t("status")}</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
             </TableHeader>

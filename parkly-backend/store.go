@@ -175,6 +175,8 @@ func (s *Store) InitDB() {
 		`CREATE TABLE IF NOT EXISTS registros (
 			id VARCHAR(50) PRIMARY KEY,
 			placa VARCHAR(50) NOT NULL,
+			owner VARCHAR(100),
+			customer_id VARCHAR(50),
 			tipo_vehiculo_id VARCHAR(50),
 			espacio_id VARCHAR(50),
 			fecha_hora_entrada DATETIME NOT NULL,
@@ -219,12 +221,12 @@ func (s *Store) Seed() {
 	
 	// Seed Rates
 	rates := []Rate{
-		{ID: "R-1", VehicleType: Sedan, Unit: Minute, Value: 0.10, Currency: "EUR"},
-		{ID: "R-2", VehicleType: SUV, Unit: Minute, Value: 0.15, Currency: "EUR"},
-		{ID: "R-3", VehicleType: Motorcycle, Unit: Minute, Value: 0.05, Currency: "EUR"},
-		{ID: "R-4", VehicleType: Sedan, Unit: Hour, Value: 5.00, Currency: "EUR"},
-		{ID: "R-5", VehicleType: SUV, Unit: Hour, Value: 7.00, Currency: "EUR"},
-		{ID: "R-6", VehicleType: Motorcycle, Unit: Hour, Value: 2.50, Currency: "EUR"},
+		{ID: "R-1", VehicleType: Sedan, Unit: Minute, Value: 0.05, Currency: "EUR"},
+		{ID: "R-2", VehicleType: SUV, Unit: Minute, Value: 0.08, Currency: "EUR"},
+		{ID: "R-3", VehicleType: Motorcycle, Unit: Minute, Value: 0.03, Currency: "EUR"},
+		{ID: "R-4", VehicleType: Sedan, Unit: Hour, Value: 2.50, Currency: "EUR"},
+		{ID: "R-5", VehicleType: SUV, Unit: Hour, Value: 4.00, Currency: "EUR"},
+		{ID: "R-6", VehicleType: Motorcycle, Unit: Hour, Value: 1.50, Currency: "EUR"},
 	}
 	for _, r := range rates {
 		_, err := s.db.Exec("INSERT IGNORE INTO tarifas (id, tipo_vehiculo_id, unit, valor, currency) VALUES (?, ?, ?, ?, ?)", 
@@ -249,6 +251,29 @@ func (s *Store) Seed() {
 		id := fmt.Sprintf("M%02d", i)
 		s.db.Exec("INSERT IGNORE INTO espacios (id, label, zone, tipo_vehiculo_id) VALUES (?, ?, ?, ?)", id, id, "Moto-M", Motorcycle)
 	}
+	// Seed some completed movements for the dashboard
+	now := time.Now()
+	yesterday := now.Add(-24 * time.Hour)
+	oneHourAgo := now.Add(-1 * time.Hour)
+	twoHoursAgo := now.Add(-2 * time.Hour)
+
+	sampleMovements := []Movement{
+		{
+			ID: "M-SEED-1", Plate: "ABC-123", Type: Sedan, Owner: "John Doe", SlotID: "A01",
+			CheckIn: yesterday, CheckOut: &oneHourAgo, Amount: 12.50, Currency: "EUR", Status: Completed,
+			RateSnapshot: rates[3],
+		},
+		{
+			ID: "M-SEED-2", Plate: "XYZ-789", Type: SUV, Owner: "Jane Smith", SlotID: "B01",
+			CheckIn: twoHoursAgo, CheckOut: &now, Amount: 8.00, Currency: "EUR", Status: Completed,
+			RateSnapshot: rates[4],
+		},
+	}
+	for _, m := range sampleMovements {
+		snapshotJSON, _ := json.Marshal(m.RateSnapshot)
+		s.db.Exec("INSERT IGNORE INTO registros (id, placa, owner, tipo_vehiculo_id, espacio_id, fecha_hora_entrada, fecha_hora_salida, amount, currency, estado, rate_snapshot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			m.ID, m.Plate, m.Owner, m.Type, m.SlotID, m.CheckIn, m.CheckOut, m.Amount, m.Currency, m.Status, snapshotJSON)
+	}
 	log.Println("Seeding complete.")
 }
 
@@ -257,7 +282,7 @@ func (s *Store) Seed() {
 func (s *Store) GetCustomers() []Customer {
 	rows, _ := s.db.Query("SELECT id, name, email, phone, plates, plan, notes, created_at FROM customers ORDER BY created_at DESC")
 	defer rows.Close()
-	var customers []Customer
+	customers := []Customer{}
 	for rows.Next() {
 		var c Customer
 		var platesJSON []byte
@@ -303,7 +328,7 @@ func (s *Store) DeleteCustomer(id string) bool {
 func (s *Store) GetSlots() []Slot {
 	rows, _ := s.db.Query("SELECT id, label, zone, tipo_vehiculo_id, plate, owner, customer_id, entered_at, rate_snapshot FROM espacios")
 	defer rows.Close()
-	var slots []Slot
+	slots := []Slot{}
 	for rows.Next() {
 		var sl Slot
 		var pv *ParkedVehicle
@@ -359,27 +384,40 @@ func (s *Store) DeleteSlot(id string) bool {
 }
 
 func (s *Store) GetMovements() []Movement {
-	rows, _ := s.db.Query("SELECT id, placa, tipo_vehiculo_id, espacio_id, fecha_hora_entrada, fecha_hora_salida, amount, currency, estado, rate_snapshot FROM registros ORDER BY fecha_hora_entrada DESC")
+	rows, _ := s.db.Query("SELECT id, placa, owner, customer_id, tipo_vehiculo_id, espacio_id, fecha_hora_entrada, fecha_hora_salida, amount, currency, estado, rate_snapshot FROM registros ORDER BY fecha_hora_entrada DESC")
 	defer rows.Close()
-	var movements []Movement
+	movements := []Movement{}
 	for rows.Next() {
 		var m Movement
 		var checkOut sql.NullTime
+		var amount sql.NullFloat64
+		var currency sql.NullString
 		var snapshotJSON []byte
-		rows.Scan(&m.ID, &m.Plate, &m.Type, &m.SlotID, &m.CheckIn, &checkOut, &m.Amount, &m.Currency, &m.Status, &snapshotJSON)
+		err := rows.Scan(&m.ID, &m.Plate, &m.Owner, &m.CustomerID, &m.Type, &m.SlotID, &m.CheckIn, &checkOut, &amount, &currency, &m.Status, &snapshotJSON)
+		if err != nil {
+			log.Printf("ERROR: Scan error in GetMovements: %v", err)
+			continue
+		}
 		if checkOut.Valid {
 			m.CheckOut = &checkOut.Time
+		}
+		if amount.Valid {
+			m.Amount = amount.Float64
+		}
+		if currency.Valid {
+			m.Currency = currency.String
 		}
 		json.Unmarshal(snapshotJSON, &m.RateSnapshot)
 		movements = append(movements, m)
 	}
+	log.Printf("DEBUG: GetMovements fetched %d movements from DB", len(movements))
 	return movements
 }
 
 func (s *Store) AddMovement(m Movement) Movement {
 	snapshotJSON, _ := json.Marshal(m.RateSnapshot)
-	s.db.Exec("INSERT INTO registros (id, placa, tipo_vehiculo_id, espacio_id, fecha_hora_entrada, currency, estado, rate_snapshot) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-		m.ID, m.Plate, m.Type, m.SlotID, m.CheckIn, m.Currency, m.Status, snapshotJSON)
+	s.db.Exec("INSERT INTO registros (id, placa, owner, customer_id, tipo_vehiculo_id, espacio_id, fecha_hora_entrada, currency, estado, rate_snapshot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		m.ID, m.Plate, m.Owner, m.CustomerID, m.Type, m.SlotID, m.CheckIn, m.Currency, m.Status, snapshotJSON)
 	return m
 }
 
@@ -391,16 +429,23 @@ func (s *Store) UpdateMovement(id string, updated Movement) bool {
 	}
 	_, err := s.db.Exec("UPDATE registros SET fecha_hora_salida=?, amount=?, currency=?, estado=?, rate_snapshot=? WHERE id=?",
 		checkOut, updated.Amount, updated.Currency, updated.Status, snapshotJSON, id)
+	if err != nil {
+		log.Printf("DB Error in UpdateMovement: %v", err)
+	}
 	return err == nil
 }
 
 func (s *Store) GetRates() []Rate {
 	rows, _ := s.db.Query("SELECT id, tipo_vehiculo_id, unit, valor, fraction_min, currency FROM tarifas WHERE activo = 1")
 	defer rows.Close()
-	var rates []Rate
+	rates := []Rate{}
 	for rows.Next() {
 		var r Rate
-		rows.Scan(&r.ID, &r.VehicleType, &r.Unit, &r.Value, &r.FractionMin, &r.Currency)
+		var fmin sql.NullInt64
+		rows.Scan(&r.ID, &r.VehicleType, &r.Unit, &r.Value, &fmin, &r.Currency)
+		if fmin.Valid {
+			r.FractionMin = int(fmin.Int64)
+		}
 		rates = append(rates, r)
 	}
 	return rates
@@ -408,8 +453,12 @@ func (s *Store) GetRates() []Rate {
 
 func (s *Store) GetActiveRate(vType VehicleType) (Rate, bool) {
 	var r Rate
+	var fmin sql.NullInt64
 	err := s.db.QueryRow("SELECT id, tipo_vehiculo_id, unit, valor, fraction_min, currency FROM tarifas WHERE tipo_vehiculo_id = ? AND activo = 1 LIMIT 1", vType).
-		Scan(&r.ID, &r.VehicleType, &r.Unit, &r.Value, &r.FractionMin, &r.Currency)
+		Scan(&r.ID, &r.VehicleType, &r.Unit, &r.Value, &fmin, &r.Currency)
+	if fmin.Valid {
+		r.FractionMin = int(fmin.Int64)
+	}
 	return r, err == nil
 }
 

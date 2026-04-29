@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useParkingStore } from "@/lib/parking-store";
 import { formatCurrency, cn } from "@/lib/utils";
 import type { Movement } from "@/lib/parking-types";
+import { useTranslation } from "@/lib/translations";
 
 interface MovementsTableProps {
   movements: Movement[];
@@ -23,19 +24,21 @@ function formatTime(d: Date) {
 
 export function MovementsTable({ movements, limit }: MovementsTableProps) {
   const currency = useParkingStore((s) => s.currency);
+  const language = useParkingStore((s) => s.language);
+  const { t } = useTranslation(language);
   const list = limit ? movements.slice(0, limit) : movements;
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card">
       <Table>
         <TableHeader>
           <TableRow className="border-border/60 hover:bg-transparent">
-            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Plate</TableHead>
-            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Owner</TableHead>
-            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Slot</TableHead>
-            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">In</TableHead>
-            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Out</TableHead>
-            <TableHead className="text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Amount</TableHead>
-            <TableHead className="text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Status</TableHead>
+            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{t("plate")}</TableHead>
+            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{t("owner")}</TableHead>
+            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{t("slot")}</TableHead>
+            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{t("in")}</TableHead>
+            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{t("out")}</TableHead>
+            <TableHead className="text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{t("amount")}</TableHead>
+            <TableHead className="text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{t("status")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -64,7 +67,11 @@ export function MovementsTable({ movements, limit }: MovementsTableProps) {
                   {m.checkOut ? formatTime(m.checkOut) : <span className="text-muted-foreground">—</span>}
                 </TableCell>
                 <TableCell className="text-right text-sm tabular-nums">
-                  {m.amount > 0 ? formatCurrency(m.amount, currency) : <span className="text-muted-foreground">—</span>}
+                  {m.status === "completed" 
+                    ? formatCurrency(m.amount, currency) 
+                    : m.amount > 0 
+                      ? formatCurrency(m.amount, currency)
+                      : <span className="text-muted-foreground">—</span>}
                 </TableCell>
                 <TableCell className="text-right">
                   <Badge
@@ -87,7 +94,7 @@ export function MovementsTable({ movements, limit }: MovementsTableProps) {
                         m.status === "overdue" && "bg-destructive",
                       )}
                     />
-                    {m.status}
+                    {t(m.status as any)}
                   </Badge>
                 </TableCell>
               </TableRow>
