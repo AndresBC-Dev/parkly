@@ -1,0 +1,39 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: parkly-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: parkly
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+
+  backend:
+    build: ./parkly-backend
+    container_name: parkly-backend
+    restart: always
+    environment:
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: parkly
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./parkly-frontend
+    container_name: parkly-frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  db-data:
