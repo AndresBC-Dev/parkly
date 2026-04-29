@@ -1,13 +1,14 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080/api",
+  // Usamos (import.meta as any).env para que TS no moleste
+  // y quitamos el .env repetido
+  baseURL: (import.meta as any).env.VITE_API_URL || "http://localhost:8080/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Add a request interceptor to add the auth token to headers
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("parkly_token");
@@ -18,7 +19,7 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
