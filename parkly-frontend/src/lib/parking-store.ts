@@ -31,8 +31,10 @@ interface ParkingState {
   movements: Movement[];
   rates: Rate[];
   currency: Currency;
+  language: Language;
 
   setCurrency: (c: Currency) => void;
+  setLanguage: (l: Language) => void;
   migrateRates: (to: Currency) => Promise<void>;
   fetchCustomers: () => Promise<void>;
   fetchSlots: () => Promise<void>;
@@ -70,10 +72,16 @@ export const useParkingStore = create<ParkingState>((set, get) => ({
   movements: initialMovements,
   rates: initialRates,
   currency: (localStorage.getItem("parkly_currency") as Currency) || "EUR",
+  language: (localStorage.getItem("parkly_language") as Language) || "es",
 
   setCurrency: (c: Currency) => {
     localStorage.setItem("parkly_currency", c);
     set({ currency: c });
+  },
+
+  setLanguage: (l: Language) => {
+    localStorage.setItem("parkly_language", l);
+    set({ language: l });
   },
 
   migrateRates: async (to) => {

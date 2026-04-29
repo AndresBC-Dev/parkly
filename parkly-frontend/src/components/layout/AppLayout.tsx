@@ -7,11 +7,17 @@ import { Button } from "@/components/ui/button";
 import { CheckInDialog } from "@/components/checkin/CheckInDialog";
 import { GlobalSearch } from "./GlobalSearch";
 
+import { useParkingStore } from "@/lib/parking-store";
+import { useTranslation } from "@/lib/translations";
+
 interface AppLayoutProps {
   children: ReactNode;
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
+  const language = useParkingStore((s) => s.language);
+  const { t } = useTranslation(language);
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -20,14 +26,14 @@ export function AppLayout({ children }: AppLayoutProps) {
         <div className="flex flex-1 flex-col min-w-0">
           <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur-md">
             <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
-            <GlobalSearch />
+            <GlobalSearch placeholder={t("search")} />
 
             <div className="ml-auto flex items-center gap-2">
               <CheckInDialog
                 trigger={
                   <Button size="sm" className="gap-1.5 shadow-sm">
                     <Plus className="h-3.5 w-3.5" />
-                    Quick Entry
+                    {t("newCheckIn")}
                   </Button>
                 }
               />
@@ -50,7 +56,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             target="_blank"
             rel="noopener noreferrer"
             className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-110 active:scale-95"
-            title="Soporte WhatsApp"
+            title={language === "es" ? "Soporte WhatsApp" : "WhatsApp Support"}
           >
             <MessageCircle className="h-6 w-6" />
           </a>

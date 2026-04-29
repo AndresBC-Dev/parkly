@@ -38,6 +38,7 @@ import { useParkingStore } from "@/lib/parking-store";
 import type { VehicleType, Currency } from "@/lib/parking-types";
 import { toast } from "sonner";
 import { Coins } from "lucide-react";
+import { useTranslation } from "@/lib/translations";
 
 const Settings = () => {
   const slots = useParkingStore((s) => s.slots);
@@ -46,7 +47,9 @@ const Settings = () => {
   const updateSlot = useParkingStore((s) => s.updateSlot);
   const currency = useParkingStore((s) => s.currency);
   const setCurrency = useParkingStore((s) => s.setCurrency);
-  const migrateRates = useParkingStore((s) => s.migrateRates);
+  const language = useParkingStore((s) => s.language);
+  const { t } = useTranslation(language);
+  const setLanguage = useParkingStore((s) => s.setLanguage);
 
   const [newSlot, setNewSlot] = useState({
     label: "",
@@ -71,7 +74,7 @@ const Settings = () => {
       <div className="mx-auto max-w-7xl space-y-8 p-6 lg:p-10">
         <PageHeader
           eyebrow="System"
-          title="Settings"
+          title={t("settings")}
           description="Configure your facility layout, security, and general preferences."
         />
 
@@ -79,15 +82,15 @@ const Settings = () => {
           <TabsList className="bg-muted/50 p-1">
             <TabsTrigger value="facility" className="gap-2">
               <Layout className="h-4 w-4" />
-              Parking Layout
+              {t("parkingLayout")}
             </TabsTrigger>
             <TabsTrigger value="general" className="gap-2">
               <SettingsIcon className="h-4 w-4" />
-              General
+              {t("general")}
             </TabsTrigger>
             <TabsTrigger value="security" className="gap-2">
               <ShieldCheck className="h-4 w-4" />
-              Security
+              {t("staffPermissions")}
             </TabsTrigger>
           </TabsList>
 
@@ -246,12 +249,15 @@ const Settings = () => {
                     value={currency} 
                     onValueChange={async (v) => {
                       const newCurr = v as Currency;
-                      if (confirm(`Do you want to automatically convert all your existing Pricing Rates to ${newCurr}? (Using current exchange rates)`)) {
+                      const msg = language === "es" 
+                        ? `¿Quieres convertir automáticamente todas tus tarifas actuales a ${newCurr}?`
+                        : `Do you want to automatically convert all your existing Pricing Rates to ${newCurr}?`;
+                      if (confirm(msg)) {
                         await migrateRates(newCurr);
-                        toast.success(`Currency changed to ${v} and rates converted!`);
+                        toast.success(language === "es" ? "Moneda cambiada y tarifas convertidas" : `Currency changed to ${v} and rates converted!`);
                       } else {
                         setCurrency(newCurr);
-                        toast.success(`Currency changed to ${v} (Values left unchanged)`);
+                        toast.success(language === "es" ? "Moneda cambiada" : `Currency changed to ${v}`);
                       }
                     }}
                   >
@@ -262,6 +268,26 @@ const Settings = () => {
                       <SelectItem value="EUR">EUR (€)</SelectItem>
                       <SelectItem value="USD">USD ($)</SelectItem>
                       <SelectItem value="COP">COP ($)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                <div className="flex items-center justify-between gap-4 py-2 border-t border-border/50 pt-4">
+                  <div className="space-y-0.5">
+                    <Label>Language / Idioma</Label>
+                    <p className="text-xs text-muted-foreground">Select your preferred language.</p>
+                  </div>
+                  <Select 
+                    value={language} 
+                    onValueChange={(v) => {
+                      setLanguage(v as any);
+                      toast.success(v === "es" ? "Idioma cambiado a Español" : "Language changed to English");
+                    }}
+                  >
+                    <SelectTrigger className="w-[120px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="es">Español</SelectItem>
+                      <SelectItem value="en">English</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

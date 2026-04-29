@@ -20,8 +20,11 @@ import { CheckInDialog } from "@/components/checkin/CheckInDialog";
 import { useParkingStore } from "@/lib/parking-store";
 import { formatCurrency } from "@/lib/utils";
 import { sumConverted } from "@/lib/currency-utils";
+import { useTranslation } from "@/lib/translations";
 
 const Dashboard = () => {
+  const language = useParkingStore((s) => s.language);
+  const { t } = useTranslation(language);
   const slots = useParkingStore((s) => s.slots);
   const movements = useParkingStore((s) => s.movements);
   const currency = useParkingStore((s) => s.currency);
@@ -68,14 +71,14 @@ const Dashboard = () => {
         <div className="mx-auto max-w-7xl space-y-8 p-6 lg:p-10">
           <PageHeader
             eyebrow="Garage 01 · Calle Serrano"
-            title="Operations dashboard"
+            title={t("dashboard")}
             description="Live overview of your parking facility — occupancy, revenue and current vehicles."
             actions={
               <CheckInDialog
                 trigger={
                   <Button className="gap-1.5">
                     <Plus className="h-4 w-4" />
-                    New check-in
+                    {t("newCheckIn")}
                   </Button>
                 }
               />
@@ -84,27 +87,27 @@ const Dashboard = () => {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <KpiCard
-              label="Occupancy"
+              label={t("occupancy")}
               value={`${occupancy}%`}
               delta={4}
               hint="vs. yesterday"
               icon={CircleParking}
             />
             <KpiCard
-              label="Revenue today"
+              label={t("revenueToday")}
               value={formatCurrency(revenueToday, currency)}
               delta={12}
               hint="vs. yesterday"
               icon={Wallet}
             />
             <KpiCard
-              label="Active vehicles"
+              label={t("activeVehicles")}
               value={String(occupied)}
               hint={`${sedansActive + suvsActive} cars · ${bikesActive} bikes`}
               icon={CarFront}
             />
             <KpiCard
-              label="Avg. stay"
+              label={t("avgStay")}
               value={avgStayLabel}
               delta={-3}
               hint="vs. yesterday"
@@ -170,10 +173,10 @@ const Dashboard = () => {
 
           <div>
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-sm font-semibold tracking-tight">Recent movements</h2>
+              <h2 className="text-sm font-semibold tracking-tight">{t("recentMovements")}</h2>
               <Button asChild variant="ghost" size="sm" className="gap-1 text-xs">
                 <Link to="/operations">
-                  View all
+                  {t("viewAll")}
                   <ArrowUpRight className="h-3.5 w-3.5" />
                 </Link>
               </Button>

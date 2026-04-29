@@ -24,18 +24,19 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useParkingStore } from "@/lib/parking-store";
+import { useTranslation } from "@/lib/translations";
 import { Button } from "../ui/button";
 
 const mainItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Live Map", url: "/map", icon: MapIcon },
-  { title: "Operations", url: "/operations", icon: ListOrdered },
+  { title: "dashboard", url: "/", icon: LayoutDashboard },
+  { title: "live_map", url: "/map", icon: MapIcon },
+  { title: "operations", url: "/operations", icon: ListOrdered },
 ];
 
 const secondaryItems = [
-  { title: "Customers", url: "/customers", icon: Users },
-  { title: "Rates", url: "/rates", icon: Banknote },
-  { title: "Settings", url: "/settings", icon: Settings },
+  { title: "customers", url: "/customers", icon: Users },
+  { title: "rates", url: "/rates", icon: Banknote },
+  { title: "settings", url: "/settings", icon: Settings },
 ];
 
 export function AppSidebar() {
@@ -44,6 +45,8 @@ export function AppSidebar() {
   const { pathname } = useLocation();
   const logout = useParkingStore((s) => s.logout);
   const user = useParkingStore((s) => s.user);
+  const language = useParkingStore((s) => s.language);
+  const { t } = useTranslation(language);
 
   const isActive = (path: string) =>
     path === "/" ? pathname === "/" : pathname.startsWith(path);
@@ -70,7 +73,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("general")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainItems.map((item) => (
@@ -78,7 +81,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
                     <NavLink to={item.url} className="flex items-center gap-2.5">
                       <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
+                      <span>{t(item.title as any)}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -88,7 +91,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("settings")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {secondaryItems.map((item) => (
@@ -96,7 +99,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
                     <NavLink to={item.url} className="flex items-center gap-2.5">
                       <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
+                      <span>{t(item.title as any)}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -117,7 +120,7 @@ export function AppSidebar() {
                 {user?.name || "Alex Moreno"}
               </span>
               <span className="truncate text-[11px] text-muted-foreground">
-                {user?.role === "admin" ? "Administrator" : "Operator"} · Garage 01
+                {user?.role === "admin" ? t("settings") : t("operations")} · Garage 01
               </span>
             </div>
           )}

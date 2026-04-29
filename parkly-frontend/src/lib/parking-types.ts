@@ -2,6 +2,7 @@ export type VehicleType = "sedan" | "suv" | "motorcycle";
 
 export type RateUnit = "minute" | "hour" | "fraction" | "day";
 export type Currency = "USD" | "EUR" | "COP";
+export type Language = "en" | "es";
 
 export interface Rate {
   id: string;
